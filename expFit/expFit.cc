@@ -189,6 +189,8 @@ cout << "---------------------------------------------------------------" << end
 cout << "ML Estimators" << endl;
 cout << "---------------------------------------------------------------" << endl;
 
+cout << "param#" << "\t" << "param" << "\t" << "Value" << "\t" << "error" << endl;
+
 for (int i = 0; i < npar; i++) {
     TString chnam; // name of parameter.
     double val; //actual value.
@@ -197,7 +199,7 @@ for (int i = 0; i < npar; i++) {
     int iuint; //internal parameter number
 
     minuit.mnpout(i, chnam, val, err, xlolim, xuplim, iuint);
-    cout << i << " " << chnam << " " << val << " " << err << endl;
+    cout << i << "\t" << chnam << "\t" << val << "\t" << err << endl;
 }
 
 cout << "---------------------------------------------------------------" << endl;
@@ -205,19 +207,39 @@ cout << "Covariance Matrices" << endl;
 cout << "---------------------------------------------------------------" << endl;
 
 double covariance_matrix[npar][npar];
+double rho[npar][npar];
 minuit.mnemat(&covariance_matrix[0][0], npar);
 
-double stdx, stdy, rho;
+double stdx, stdy;
 
 for ( int x = 0; x < npar; x++){
+    cout << "|";
     for ( int y = 0; y < npar; y++){
         stdx = sqrt(covariance_matrix[x][x]);
         stdy = sqrt(covariance_matrix[y][y]);
-        rho = covariance_matrix[x][y]/(stdx * stdy);
-        cout << x << " " << y << " " << covariance_matrix[x][y] << " " << rho << endl;
+        rho[x][y] = covariance_matrix[x][y]/(stdx * stdy); //corelation coefficient
+        //cout << x << "\t" << y << "\t" << covariance_matrix[x][y] << "\t" << rho << endl;
+        cout << covariance_matrix[x][y] << "\t";
     }
+
+    cout << "|";
+    cout << endl;
 }
 
+cout << "---------------------------------------------------------------" << endl;
+cout << "Correlation Coefficients" << endl;
+cout << "---------------------------------------------------------------" << endl;
+
+
+//display the corelation coefficient
+for ( int x = 0; x < npar; x++){
+    cout << "|";
+    for( int y = 0; y < npar; y ++){
+    cout << rho[x][y] << "\t";
+    }
+    cout << "|";
+    cout << endl;
+}
 
 
 
@@ -236,6 +258,7 @@ for ( int x = 0; x < npar; x++){
   func->GetXaxis()->SetTitle("x");
   //func->GetYaxis()->SetTitle("f(x;#xi)");
   func -> GetYaxis() -> SetTitle("f(x; #alpha, #xi_{1}, #xi_{2})");
+  func -> SetTitle("PS7 Exercise 2 (TMinuit)");
   vector<double> xVec = *xVecPtr;
   const double tickHeight = 0.1;
   TLine* tick = new TLine();
